@@ -1,50 +1,40 @@
-import React, { Component } from "react"
-import logo from "./logo.svg"
-import "./App.css"
+import React, { useState } from 'react';
+import Menu from './Menu';
+import Categories from './Categories';
+import items from './data';
+import './App.css';
 
-class LambdaDemo extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { loading: false, msg: null }
-  }
+const allCategories = ['all', ...new Set(items.map((item) => item.category))];
+console.log(allCategories);
 
-  handleClick = api => e => {
-    e.preventDefault()
 
-    this.setState({ loading: true })
-    fetch("/.netlify/functions/" + api)
-      .then(response => response.json())
-      .then(json => this.setState({ loading: false, msg: json.msg }))
-  }
+function App() {
 
-  render() {
-    const { loading, msg } = this.state
+  const [menuItems, setMenuItems] = useState(items);
+  const [categories, setCategories] = useState(allCategories);
 
-    return (
-      <p>
-        <button onClick={this.handleClick("hello")}>{loading ? "Loading..." : "Call Lambda"}</button>
-        <button onClick={this.handleClick("async-dadjoke")}>{loading ? "Loading..." : "Call Async Lambda"}</button>
-        <br />
-        <span>{msg}</span>
-      </p>
-    )
-  }
+  const filterItems = (category) => {
+    if (category === 'all'){
+      setMenuItems(items);
+      return;
+    }
+    const newItems = items.filter((item)=> item.category === category);
+    setMenuItems(newItems);
+  };
+
+
+  return (
+    <main>
+    <section className="menu-section">
+      <div className='title'>
+      <h2>Our Menu</h2>
+     <div className='underline'></div>
+     </div>
+     <Categories categories={categories} filterItems={filterItems} />
+     <Menu items = {menuItems} />
+    </section>
+    </main>
+  );
 }
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <LambdaDemo />
-        </header>
-      </div>
-    )
-  }
-}
-
-export default App
+export default App;
